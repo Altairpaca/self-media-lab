@@ -1,0 +1,47 @@
+{
+  "provider": "self-hosted-douyin-cli",
+  "tab": "realtime",
+  "captured_at": "2026-08-20T16:06:54.247817+00:00",
+  "items": [
+    {
+      "rank": 1,
+      "word": "台风沙德尔或于26日移入东海",
+      "hot_value": 12119982,
+      "label": "3",
+      "tab": "realtime",
+      "url": "https://www.douyin.com/search/%E5%8F%B0%E9%A3%8E%E6%B2%99%E5%BE%B7%E5%B0%94%E6%88%96%E4%BA%8E26%E6%97%A5%E7%A7%BB%E5%85%A5%E4%B8%9C%E6%B5%B7"
+    },
+    {
+      "rank": 2,
+      "word": "美这件事我只取悦自己",
+      "hot_value": 11950821,
+      "label": "3",
+      "tab": "realtime",
+      "url": "https://www.douyin.com/search/%E7%BE%8E%E8%BF%99%E4%BB%B6%E4%BA%8B%E6%88%91%E5%8F%AA%E5%8F%96%E6%82%A6%E8%87%AA%E5%B7%B1"
+    },
+    {
+      "rank": 3,
+      "word": "我国服务业持续扩能提质",
+      "hot_value": 11845443,
+      "label": "0",
+      "tab": "realtime",
+      "url": "https://www.douyin.com/search/%E6%88%91%E5%9B%BD%E6%9C%8D%E5%8A%A1%E4%B8%9A%E6%8C%81%E7%BB%AD%E6%89%A9%E8%83%BD%E6%8F%90%E8%B4%A8"
+    },
+    {
+      "rank": 4,
+      "word": "XLG 1:2 NOVA",
+      "hot_value": 11461893,
+      "label": "3",
+      "tab": "realtime",
+      "url": "https://www.douyin.com/search/XLG%201:2%20NOVA"
+    },
+    {
+      "rank": 5,
+      "word": "2026IVL夏季赛总决赛开幕",
+      "hot_value": 10530094,
+      "label": "0",
+      "tab": "realtime",
+      "url": "https://www.douyin.com/search/2026IVL%E5%A4%8F%E5%AD%A3%E8%B5%9B%E6%80%BB%E5%86%B3%E8%B5%9B%E5%BC%80%E5%B9%95"
+    }
+  ]
+}

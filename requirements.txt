@@ -1,0 +1,13 @@
+celery[redis]==5.4.0
+fastapi==0.115.6
+httpx==0.28.1
+psycopg[binary]==3.2.3
+python-multipart==0.0.20
+SQLAlchemy==2.0.36
+uvicorn[standard]==0.34.0
+yt-dlp==2025.1.15
+ffmpeg-python==0.2.0
+minio==7.2.12
+python-dotenv==1.0.1
+jieba==0.42.1
+faster-whisper==1.1.1

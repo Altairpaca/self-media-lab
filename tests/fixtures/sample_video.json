@@ -1,0 +1,19 @@
+{
+  "platform_id": "fixture-20260820-001",
+  "source_url": "https://www.douyin.com/video/fixture-20260820-001",
+  "title": "为什么同样做短视频，有的人三天找到方向，有的人三个月还在试错？",
+  "description": "一个用于本地回归测试的固定视频样例。",
+  "author_name": "内容实验室样例账号",
+  "duration_seconds": 42.0,
+  "likes": 12800,
+  "comments_count": 436,
+  "shares": 980,
+  "collects": 1640,
+  "views": 186000,
+  "comments": [
+    {"text": "最有用的是先做小样本验证，不要一开始就追求完美。", "likes": 821},
+    {"text": "三天找到方向这个判断标准可以展开讲讲。", "likes": 406},
+    {"text": "收藏了，正好在做账号定位。", "likes": 198},
+    {"text": "我之前一直在换赛道，确实没有记录数据。", "likes": 141}
+  ]
+}
