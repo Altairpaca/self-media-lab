@@ -96,9 +96,14 @@ def ingest_job(job_id: int) -> None:
         session.add(video)
         session.flush()
         for item in normalized.get("comments", []):
+            platform_id = str(item.get("cid", item.get("comment_id", ""))) or None
+            if platform_id and session.scalar(
+                select(Comment.id).where(Comment.video_id == video.id, Comment.platform_id == platform_id)
+            ):
+                continue
             session.add(Comment(
                 video_id=video.id,
-                platform_id=str(item.get("cid", item.get("comment_id", ""))) or None,
+                platform_id=platform_id,
                 user_id=str((item.get("user") or {}).get("uid", item.get("user_id", ""))) or None,
                 user_name=(item.get("user") or {}).get("nickname", item.get("user_name", "")),
                 text=item.get("text", item.get("content", "")),

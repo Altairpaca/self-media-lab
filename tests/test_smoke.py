@@ -1,13 +1,18 @@
 import json
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from pydantic import ValidationError
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from app.analysis import score_video
+from app.db import Base, Comment, IngestJob, Video
 from app.main import IngestRequest
 from app.provider import fetch_data, fetch_hot
+from app.pipeline import ingest_job
 
 
 class ProviderSmokeTest(unittest.TestCase):
@@ -56,6 +61,48 @@ class ProviderSmokeTest(unittest.TestCase):
         ):
             with self.subTest(url=unsafe_url), self.assertRaises(ValidationError):
                 IngestRequest(url=unsafe_url)
+
+    def test_ingest_reuses_existing_comment_platform_ids(self):
+        with tempfile.TemporaryDirectory() as directory:
+            database = Path(directory) / "media_lab.sqlite3"
+            engine = create_engine(f"sqlite:///{database}", connect_args={"check_same_thread": False})
+            Base.metadata.create_all(engine)
+            test_sessions = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+            provider_data = {
+                "platform_id": "video-1",
+                "source_url": "https://www.douyin.com/video/1",
+                "title": "测试视频",
+                "description": "",
+                "author_id": None,
+                "author_name": "测试账号",
+                "duration_seconds": 1,
+                "likes": 1,
+                "comments_count": 1,
+                "shares": 0,
+                "collects": 0,
+                "views": 10,
+                "comments": [{"cid": "comment-1", "text": "同一条评论"}],
+                "raw_data": {},
+            }
+            with test_sessions() as session:
+                session.add_all([IngestJob(url=provider_data["source_url"]) for _ in range(2)])
+                session.commit()
+                job_ids = [job.id for job in session.query(IngestJob).order_by(IngestJob.id)]
+
+            with (
+                patch("app.pipeline.SessionLocal", test_sessions),
+                patch("app.pipeline.fetch_data", return_value=provider_data),
+                patch("app.pipeline.download_video", return_value=({}, database)),
+                patch("app.pipeline.media_duration", return_value=1),
+                patch("app.pipeline._run_transcription", return_value=("", [])),
+                patch("app.pipeline._make_clips"),
+            ):
+                ingest_job(job_ids[0])
+                ingest_job(job_ids[1])
+
+            with test_sessions() as session:
+                self.assertEqual(session.query(Video).count(), 1)
+                self.assertEqual(session.query(Comment).count(), 1)
 
 
 if __name__ == "__main__":
