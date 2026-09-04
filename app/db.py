@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 from .config import settings
@@ -52,6 +52,7 @@ class Video(Base):
 
 class Comment(Base):
     __tablename__ = "comments"
+    __table_args__ = (UniqueConstraint("video_id", "platform_id", name="uq_comment_video_platform"),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     platform_id: Mapped[str | None] = mapped_column(String(128), index=True)
     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"), index=True)
