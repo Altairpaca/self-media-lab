@@ -6,29 +6,38 @@ This project is a local-first pipeline for collecting authorized Douyin video co
 
 ```bash
 cp .env.example .env
+# Replace every CHANGE_ME value before starting services.
 docker compose up --build
 ```
 
-Before any real collection, change the database and MinIO passwords in `.env`. The provider is self-hosted and uses the local `douyin` binary; no external API key is required. Configure `DOUYIN_CLI_PROFILE` for the CLI session and `DOUYIN_COOKIE_FILE` for local `yt-dlp` downloads when protected content requires it.
+The provider is self-hosted and uses the local `douyin` binary; no external API key is required. Configure `DOUYIN_CLI_PROFILE` for the CLI session and `DOUYIN_COOKIE_FILE` for local `yt-dlp` downloads when protected content requires it.
 
-API: `http://localhost:8000`
+API: `http://127.0.0.1:8000`
 
-Submit a video URL:
+Submit a Douyin video URL:
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/ingest \
+curl -X POST http://127.0.0.1:8000/api/v1/ingest \
   -H 'content-type: application/json' \
   -d '{"url":"https://www.douyin.com/video/REPLACE_ME"}'
 ```
 
+The ingest boundary accepts only HTTPS URLs on `douyin.com` or its subdomains. Arbitrary URLs are rejected before they reach local collector/download tools.
+
 Check the job and results:
 
 ```bash
-curl http://localhost:8000/api/v1/jobs/1
-curl http://localhost:8000/api/v1/videos
-curl http://localhost:8000/api/v1/videos/1/analysis
-curl 'http://localhost:8000/api/v1/videos/1/comments?limit=100'
+curl http://127.0.0.1:8000/api/v1/jobs/1
+curl http://127.0.0.1:8000/api/v1/videos
+curl http://127.0.0.1:8000/api/v1/videos/1/analysis
+curl 'http://127.0.0.1:8000/api/v1/videos/1/comments?limit=100'
 ```
+
+## Security boundary
+
+The API currently has no application authentication. Docker Compose therefore publishes the API and MinIO console to `127.0.0.1` by default. Do not set `SELF_MEDIA_BIND_ADDRESS=0.0.0.0` or expose these ports to a LAN/public network unless an authenticated reverse proxy or equivalent access-control boundary is in front of them.
+
+`.env`, browser/provider cookies, downloaded media, databases, and local agent/tool state are private runtime material and are excluded from Git. Treat comment `raw_data` and user identifiers returned by the research API as collected data that may contain personal information; do not publish database dumps or API exports without review.
 
 ## Full video plus engagement data
 

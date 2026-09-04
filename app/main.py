@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, field_validator
 from sqlalchemy import select
 
 from .db import Analysis, Comment, IngestJob, SessionLocal, Video, init_db
@@ -11,6 +11,16 @@ from .worker import run_ingest
 
 class IngestRequest(BaseModel):
     url: HttpUrl
+
+    @field_validator("url")
+    @classmethod
+    def require_douyin_https_url(cls, value: HttpUrl) -> HttpUrl:
+        host = (value.host or "").lower().rstrip(".")
+        if value.scheme != "https":
+            raise ValueError("ingest URL must use HTTPS")
+        if host != "douyin.com" and not host.endswith(".douyin.com"):
+            raise ValueError("ingest URL must target douyin.com")
+        return value
 
 
 @asynccontextmanager
@@ -29,7 +39,7 @@ def health():
 
 @app.get("/api/v1/hot")
 def hot(limit: int = 50, tab: str = "realtime"):
-    return fetch_hot(min(limit, 100), tab)
+    return fetch_hot(min(max(limit, 1), 100), tab)
 
 
 @app.post("/api/v1/ingest", status_code=202)
@@ -62,7 +72,7 @@ def job_status(job_id: int):
 def videos(limit: int = 50):
     session = SessionLocal()
     try:
-        rows = session.scalars(select(Video).order_by(Video.created_at.desc()).limit(min(limit, 200))).all()
+        rows = session.scalars(select(Video).order_by(Video.created_at.desc()).limit(min(max(limit, 1), 200))).all()
         return [{"id": row.id, "platform_id": row.platform_id, "title": row.title, "author_name": row.author_name, "likes": row.likes, "comments": row.comments_count, "shares": row.shares, "views": row.views, "video_path": row.video_path} for row in rows]
     finally:
         session.close()
@@ -91,7 +101,7 @@ def video_comments(video_id: int, limit: int = 100, offset: int = 0):
         if not video:
             raise HTTPException(404, "video not found")
         rows = session.scalars(
-            select(Comment).where(Comment.video_id == video_id).order_by(Comment.likes.desc()).offset(max(offset, 0)).limit(min(limit, 500))
+            select(Comment).where(Comment.video_id == video_id).order_by(Comment.likes.desc()).offset(max(offset, 0)).limit(min(max(limit, 1), 500))
         ).all()
         return [{
             "id": row.id,

@@ -1,7 +1,28 @@
 .env
+.env.local
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
 data/
 media/
 *.db
+
+# Local agent/tool state
+.omo/
+.opencode/
+.codegraph/
+
+# Local provider/browser credentials and downloaded artifacts
+cookies.txt
+*.cookies.txt
+
+.DS_Store
+.idea/
+.vscode/
