@@ -3,7 +3,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from pydantic import ValidationError
+
 from app.analysis import score_video
+from app.main import IngestRequest
 from app.provider import fetch_data, fetch_hot
 
 
@@ -41,6 +44,18 @@ class ProviderSmokeTest(unittest.TestCase):
         self.assertEqual(result["engagement_rate"], 0.085247)
         self.assertGreater(result["hook_score"], 0)
         self.assertTrue(result["keywords"])
+
+    def test_ingest_accepts_only_https_douyin_urls(self):
+        request = IngestRequest(url="https://v.douyin.com/example/")
+        self.assertEqual(request.url.host, "v.douyin.com")
+
+        for unsafe_url in (
+            "http://www.douyin.com/video/123",
+            "https://example.com/video/123",
+            "http://127.0.0.1:9000/internal",
+        ):
+            with self.subTest(url=unsafe_url), self.assertRaises(ValidationError):
+                IngestRequest(url=unsafe_url)
 
 
 if __name__ == "__main__":
